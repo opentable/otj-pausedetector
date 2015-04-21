@@ -17,6 +17,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -30,13 +31,15 @@ public class JvmPauseAlarm implements Runnable, Closeable
     private static final long S_THRESHOLD = 1000;
 
     private final long sleepTimeMs, alarmTimeMs;
+    private final Consumer<Long> onPause;
 
     private volatile boolean running = true;
 
-    public JvmPauseAlarm(long sleepTimeMs, long alarmTimeMs)
+    public JvmPauseAlarm(long sleepTimeMs, long alarmTimeMs, Consumer<Long> onPause)
     {
         this.sleepTimeMs = sleepTimeMs;
         this.alarmTimeMs = alarmTimeMs;
+        this.onPause = onPause;
     }
 
     public JvmPauseAlarm start()
@@ -84,6 +87,11 @@ public class JvmPauseAlarm implements Runnable, Closeable
 
             if (pauseMs > alarmTimeMs) {
                 LOG.warn("Detected pause of {}!", formatTime(pauseMs));
+                try {
+                    onPause.accept(pauseMs);
+                } catch (Exception e) {
+                    LOG.error("While calling onPause handler {}", onPause, e);
+                }
             }
 
             lastUpdate = now;
