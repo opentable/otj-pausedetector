@@ -1,0 +1,102 @@
+/**
+ * Copyright (C) 2012 Ness Computing, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.opentable.pausedetector;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import com.google.common.base.Throwables;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Singleton
+public class JvmPauseAlarm implements Runnable, Closeable
+{
+    private static final Logger LOG = LoggerFactory.getLogger(JvmPauseAlarm.class);
+    private static final long S_THRESHOLD = 1000;
+
+    private final long sleepTimeMs, alarmTimeMs;
+
+    private volatile boolean running = true;
+
+    @Inject
+    public JvmPauseAlarm(long sleepTimeMs, long alarmTimeMs)
+    {
+        this.sleepTimeMs = sleepTimeMs;
+        this.alarmTimeMs = alarmTimeMs;
+    }
+
+    public void start()
+    {
+        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("jvm-pause-alarm").build());
+        executor.submit(this);
+        executor.shutdown();
+    }
+
+    @Override
+    public void run()
+    {
+        try {
+            safeRun();
+        } catch (Exception e) {
+            LOG.error("Exiting due to exception", e);
+            throw Throwables.propagate(e);
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        LOG.info("Shutting down");
+        running = false;
+    }
+
+    private void safeRun()
+    {
+        LOG.info("Watching JVM for GC pausing.  Checking every {} for pauses of at least {}.",
+                formatTime(sleepTimeMs), formatTime(alarmTimeMs));
+
+        long lastUpdate = System.currentTimeMillis();
+        while (running) {
+            try {
+                Thread.sleep(sleepTimeMs);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                LOG.info("Exiting due to interrupt");
+                return;
+            }
+
+            final long now = System.currentTimeMillis();
+            final long pauseMs = now - lastUpdate;
+
+            if (pauseMs > alarmTimeMs) {
+                LOG.warn("Detected pause of {}!", formatTime(pauseMs));
+            }
+
+            lastUpdate = now;
+        }
+        LOG.info("Terminated");
+    }
+
+    private String formatTime(final long time) {
+        return time > S_THRESHOLD ? String.format("%.1fs", time / 1000.0) : time + "ms";
+    }
+}
