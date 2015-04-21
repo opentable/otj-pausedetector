@@ -39,11 +39,12 @@ public class JvmPauseAlarm implements Runnable, Closeable
         this.alarmTimeMs = alarmTimeMs;
     }
 
-    public void start()
+    public JvmPauseAlarm start()
     {
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("jvm-pause-alarm").build());
         executor.submit(this);
         executor.shutdown();
+        return this;
     }
 
     @Override
