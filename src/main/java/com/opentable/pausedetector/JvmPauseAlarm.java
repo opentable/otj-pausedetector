@@ -15,9 +15,12 @@ package com.opentable.pausedetector;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -32,11 +35,20 @@ public class JvmPauseAlarm implements Runnable, Closeable
 
     private final long sleepTimeMs, alarmTimeMs;
     private final Consumer<Long> onPause;
+    private final Supplier<Instant> clock;
 
     private volatile boolean running = true;
 
-    public JvmPauseAlarm(long sleepTimeMs, long alarmTimeMs, Consumer<Long> onPause)
-    {
+    public JvmPauseAlarm(long sleepTimeMs, long alarmTimeMs) {
+        this(sleepTimeMs, alarmTimeMs, l -> {});
+    }
+
+    public JvmPauseAlarm(long sleepTimeMs, long alarmTimeMs, Consumer<Long> onPause) {
+        this(Clock.systemUTC()::instant, sleepTimeMs, alarmTimeMs, onPause);
+    }
+
+    public JvmPauseAlarm(Supplier<Instant> clock, long sleepTimeMs, long alarmTimeMs, Consumer<Long> onPause) {
+        this.clock = clock;
         this.sleepTimeMs = sleepTimeMs;
         this.alarmTimeMs = alarmTimeMs;
         this.onPause = onPause;
@@ -72,7 +84,7 @@ public class JvmPauseAlarm implements Runnable, Closeable
         LOG.info("Watching JVM for GC pausing.  Checking every {} for pauses of at least {}.",
                 formatTime(sleepTimeMs), formatTime(alarmTimeMs));
 
-        long lastUpdate = System.currentTimeMillis();
+        long lastUpdate = clock.get().toEpochMilli();
         while (running) {
             try {
                 Thread.sleep(sleepTimeMs);
@@ -82,7 +94,7 @@ public class JvmPauseAlarm implements Runnable, Closeable
                 return;
             }
 
-            final long now = System.currentTimeMillis();
+            final long now = clock.get().toEpochMilli();
             final long pauseMs = now - lastUpdate;
 
             if (pauseMs > alarmTimeMs) {

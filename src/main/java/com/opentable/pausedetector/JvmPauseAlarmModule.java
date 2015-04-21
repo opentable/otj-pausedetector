@@ -13,6 +13,8 @@
  */
 package com.opentable.pausedetector;
 
+import java.time.Clock;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -46,6 +48,7 @@ public class JvmPauseAlarmModule extends AbstractModule
     static class JvmPauseAlarmProvider implements Provider<JvmPauseAlarm> {
         private final JvmPauseAlarmConfig config;
         private final Lifecycle lifecycle;
+        private Clock clock = Clock.systemUTC();
 
         @Inject
         JvmPauseAlarmProvider(JvmPauseAlarmConfig config, Lifecycle lifecycle) {
@@ -53,9 +56,14 @@ public class JvmPauseAlarmModule extends AbstractModule
             this.lifecycle = lifecycle;
         }
 
+        @Inject(optional = true)
+        void setClock(Clock clock) {
+            this.clock = clock;
+        }
+
         @Override
         public JvmPauseAlarm get() {
-            final JvmPauseAlarm alarm = new JvmPauseAlarm(config.getCheckTime().getMillis(), config.getPauseAlarmTime().getMillis(), l -> {});
+            final JvmPauseAlarm alarm = new JvmPauseAlarm(clock::instant, config.getCheckTime().getMillis(), config.getPauseAlarmTime().getMillis(), l -> {});
             if (config.isPauseAlarmEnabled()) {
                 lifecycle.addListener(LifecycleStage.START_STAGE, alarm::start);
                 lifecycle.addListener(LifecycleStage.STOP_STAGE, alarm::close);
