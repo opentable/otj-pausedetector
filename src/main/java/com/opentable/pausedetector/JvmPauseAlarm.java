@@ -56,7 +56,7 @@ public class JvmPauseAlarm implements Runnable, Closeable
 
     public JvmPauseAlarm start()
     {
-        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("jvm-pause-alarm").build());
+        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("jvm-pause-alarm").setDaemon(true).build());
         executor.submit(this);
         executor.shutdown();
         return this;
