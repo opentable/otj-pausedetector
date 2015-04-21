@@ -20,13 +20,10 @@ import java.util.concurrent.Executors;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Singleton
 public class JvmPauseAlarm implements Runnable, Closeable
 {
     private static final Logger LOG = LoggerFactory.getLogger(JvmPauseAlarm.class);
@@ -36,7 +33,6 @@ public class JvmPauseAlarm implements Runnable, Closeable
 
     private volatile boolean running = true;
 
-    @Inject
     public JvmPauseAlarm(long sleepTimeMs, long alarmTimeMs)
     {
         this.sleepTimeMs = sleepTimeMs;
