@@ -1,4 +1,4 @@
-OpenTable Jvm Pause Alarm
+OpenTable JVM Pause Alarm
 =========================
 
 [![Build Status](https://travis-ci.org/opentable/otj-pausedetector.svg)](https://travis-ci.org/opentable/otj-pausedetector)
