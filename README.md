@@ -29,5 +29,11 @@ public class MyCoolApp {
 
 This will set up the pause alarm to check every 100ms for pauses of at least 400ms.
 
+Example output:
+```
+[jvm-pause-alarm] INFO com.opentable.pausedetector.JvmPauseAlarm - Watching JVM for GC pausing.  Checking every 10ms for pauses of at least 400ms.
+[jvm-pause-alarm] WARN com.opentable.pausedetector.JvmPauseAlarm - Detected pause of 1000ms!
+```
+
 ----
 Copyright (C) 2014 OpenTable, Inc.
