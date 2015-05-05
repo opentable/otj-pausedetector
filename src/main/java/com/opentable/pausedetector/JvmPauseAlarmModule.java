@@ -65,7 +65,7 @@ public class JvmPauseAlarmModule extends AbstractModule
         public JvmPauseAlarm get() {
             final JvmPauseAlarm alarm = new JvmPauseAlarm(clock::instant, config.getCheckTime().getMillis(), config.getPauseAlarmTime().getMillis(), l -> {});
             if (config.isPauseAlarmEnabled()) {
-                lifecycle.addListener(LifecycleStage.START_STAGE, alarm::start);
+                lifecycle.addListener(LifecycleStage.CONFIGURE_STAGE, alarm::start);
                 lifecycle.addListener(LifecycleStage.STOP_STAGE, alarm::close);
             }
             return alarm;
