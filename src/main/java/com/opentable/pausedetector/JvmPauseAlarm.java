@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.google.common.base.Throwables;
@@ -27,6 +28,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
 public class JvmPauseAlarm implements Runnable, Closeable
 {
@@ -36,6 +38,8 @@ public class JvmPauseAlarm implements Runnable, Closeable
     private final long sleepTimeMs, alarmTimeMs;
     private final Consumer<Long> onPause;
     private final Supplier<Instant> clock;
+
+    private Function<Long, Marker> markerCreator = l -> null;
 
     private volatile boolean running = true;
 
@@ -52,6 +56,12 @@ public class JvmPauseAlarm implements Runnable, Closeable
         this.sleepTimeMs = sleepTimeMs;
         this.alarmTimeMs = alarmTimeMs;
         this.onPause = onPause;
+
+        try {
+            markerCreator = new PauseMetadataFactory();
+        } catch (Throwable t) {
+            LOG.trace("Failed to initialize metadata", t);
+        }
     }
 
     public JvmPauseAlarm start()
@@ -98,7 +108,7 @@ public class JvmPauseAlarm implements Runnable, Closeable
             final long pauseMs = now - lastUpdate;
 
             if (pauseMs > alarmTimeMs) {
-                LOG.warn("Detected pause of {}!", formatTime(pauseMs));
+                LOG.warn(markerCreator.apply(pauseMs), "Detected pause of {}!", formatTime(pauseMs));
                 try {
                     onPause.accept(pauseMs);
                 } catch (Exception e) {
