@@ -19,15 +19,13 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-
-import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +68,14 @@ public class JvmPauseAlarm implements Runnable, Closeable
     @PostConstruct
     public JvmPauseAlarm start()
     {
-        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("jvm-pause-alarm").setDaemon(true).build());
+        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread t = new Thread(r, "jvm-pause-alarm");
+                t.setDaemon(true);
+                return t;
+            }
+        });
         executor.submit(this);
         executor.shutdown();
         return this;
@@ -83,7 +88,7 @@ public class JvmPauseAlarm implements Runnable, Closeable
             safeRun();
         } catch (Exception e) {
             LOG.error("Exiting due to exception", e);
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
