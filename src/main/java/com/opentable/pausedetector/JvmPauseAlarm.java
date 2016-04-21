@@ -23,6 +23,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -64,6 +67,7 @@ public class JvmPauseAlarm implements Runnable, Closeable
         }
     }
 
+    @PostConstruct
     public JvmPauseAlarm start()
     {
         ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("jvm-pause-alarm").setDaemon(true).build());
@@ -83,6 +87,7 @@ public class JvmPauseAlarm implements Runnable, Closeable
         }
     }
 
+    @PreDestroy
     @Override
     public void close() throws IOException {
         LOG.info("Shutting down");

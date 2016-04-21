@@ -13,32 +13,44 @@
  */
 package com.opentable.pausedetector;
 
-import org.skife.config.Config;
-import org.skife.config.Default;
-import org.skife.config.TimeSpan;
+import java.time.Clock;
+import java.time.Duration;
+import java.util.Optional;
 
-interface JvmPauseAlarmConfig
+import javax.inject.Inject;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class JvmPauseAlarmConfiguration
 {
     /**
      * Turn the pause alarm on or off at config time.
      */
-    @Config("ot.jvm-pause.enabled")
-    @Default("true")
-    boolean isPauseAlarmEnabled();
+    @Value("${ot.jvm-pause.enabled:true}")
+    boolean isPauseAlarmEnabled;
 
     /**
      * The pause alarm will check this often to see if the JVM was taking a nap.
      * This time should be significantly smaller than the pause time, or you
      * may regret it...
      */
-    @Config("ot.jvm-pause.check-time")
-    @Default("50ms")
-    TimeSpan getCheckTime();
+    @Value("${ot.jvm-pause.check-time:PT0.05s}")
+    Duration checkTime;
 
     /**
      * Report pauses that last longer than this amount.
      */
-    @Config("ot.jvm-pause.pause-time")
-    @Default("200ms")
-    TimeSpan getPauseAlarmTime();
+    @Value("${ot.jvm-pause.pause-time:PT0.2s}")
+    Duration pauseAlarmTime;
+
+    @Inject
+    Optional<Clock> clock;
+
+    @Bean
+    public JvmPauseAlarm jvmPauseAlarm() {
+        return new JvmPauseAlarm(clock.orElse(Clock.systemUTC())::instant, checkTime.toMillis(), pauseAlarmTime.toMillis(), (t) -> {});
+    }
 }
