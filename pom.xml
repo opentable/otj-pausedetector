@@ -19,7 +19,7 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-oss</artifactId> <!-- XXX: need spring-oss parent -->
-    <version>50-SNAPSHOT</version>
+    <version>51</version>
   </parent>
 
   <scm>
