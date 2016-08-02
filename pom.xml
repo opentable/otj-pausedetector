@@ -36,7 +36,7 @@
   <description>OpenTable JVM pause detector component</description>
 
   <properties>
-    <ot.spring.version>4.3.0.RC1</ot.spring.version>
+    <ot.spring.version>4.3.0.RELEASE</ot.spring.version>
   </properties>
 
   <dependencies>
