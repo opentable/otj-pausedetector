@@ -35,5 +35,14 @@ Example output:
 [jvm-pause-alarm] WARN com.opentable.pausedetector.JvmPauseAlarm - Detected pause of 1000ms!
 ```
 
+For Spring, you can import `JvmPauseAlarmConfiguration` and starting / stopping the alarm
+is taken care of for you.  You then use the following properties to configure it:
+
+```
+ot.jvm-pause.enabled=true
+ot.jvm-pause.check-time=PT0.05s
+ot.jvm-pause.pause-time=PT0.2s
+```
+
 ----
-Copyright (C) 2014 OpenTable, Inc.
+Copyright (C) 2016 OpenTable, Inc.
