@@ -35,10 +35,6 @@
   <version>2.0.1-SNAPSHOT</version>
   <description>OpenTable JVM pause detector component</description>
 
-  <properties>
-    <dep.otj-logging.version>2.0.0</dep.otj-logging.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
