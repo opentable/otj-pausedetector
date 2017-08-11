@@ -31,6 +31,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+/**
+ * This class performs a simple task, to try to detect a pause in a process (usually a JVM GC process).
+ * To do so, it simply runs a background thread, and marks the time that elapsed before and after a
+ * sleep interval. If this exceeeds some threshold, the alarm is triggered by calling the onPause consumer.
+ *
+ * Note: This is only &quot;mostly&quot; correct. For 100% correctness you must use a strictly monotonic clock - eg
+ * one that always increases and never goes backwards. Otherwise you can get both false positives and false negatives.
+ *
+ * System.nanoTime partially fills this requirement, but
+ * moving backwards or clock skew has been reported. CLOCK_MONOTONIC_RAW a newish kernel call suppposedly addresses
+ * this but has not been applied to JVM.
+ */
 public class JvmPauseAlarm implements Runnable, Closeable
 {
     private static final Logger LOG = LoggerFactory.getLogger(JvmPauseAlarm.class);
