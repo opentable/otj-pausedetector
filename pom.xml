@@ -40,7 +40,7 @@
       <dependency>
         <groupId>com.opentable.components</groupId>
         <artifactId>otj-logging</artifactId>
-        <version>${dep.otj-logging.version}</version>
+         <version>2.7.2-SNAPSHOT</version>
         <exclusions>
           <exclusion>
             <groupId>ch.qos.logback</groupId>
