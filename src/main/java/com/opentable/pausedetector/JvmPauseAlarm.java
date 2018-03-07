@@ -52,7 +52,7 @@ public class JvmPauseAlarm implements Runnable, Closeable
     private final Consumer<Long> onPause;
     private final Supplier<Instant> clock;
 
-    private Function<Long, Marker> markerCreator = l -> null; //NOPMD
+    private Function<Long, Marker> markerCreator = l -> null; //NOPMD - I'm lazy and setting this final with a catch is PITA
 
     private volatile boolean running = true;
 
@@ -73,7 +73,7 @@ public class JvmPauseAlarm implements Runnable, Closeable
         try {
             markerCreator = new PauseMetadataFactory();
         } catch (Throwable t) { //NOPMD - NoClassDefFound Possible
-             LOG.trace("Failed to initialize metadata", t);
+            LOG.trace("Failed to initialize metadata", t);
         }
     }
 
