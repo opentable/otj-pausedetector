@@ -34,13 +34,13 @@ import org.slf4j.Marker;
 /**
  * This class performs a simple task, to try to detect a pause in a process (usually a JVM GC process).
  * To do so, it simply runs a background thread, and marks the time that elapsed before and after a
- * sleep interval. If this exceeeds some threshold, the alarm is triggered by calling the onPause consumer.
+ * sleep interval. If this exceeds some threshold, the alarm is triggered by calling the onPause consumer.
  *
- * Note: This is only &quot;mostly&quot; correct. For 100% correctness you must use a strictly monotonic clock - eg
+ * Note: This is only &quot;mostly&quot; correct. For 100% correctness you must use a strictly monotonic clock - e.g.
  * one that always increases and never goes backwards. Otherwise you can get both false positives and false negatives.
  *
  * System.nanoTime partially fills this requirement, but
- * moving backwards or clock skew has been reported. CLOCK_MONOTONIC_RAW a newish kernel call suppposedly addresses
+ * moving backwards or clock skew has been reported. CLOCK_MONOTONIC_RAW a newish kernel call supposedly addresses
  * this but has not been applied to JVM.
  */
 public class JvmPauseAlarm implements Runnable, Closeable
@@ -56,14 +56,32 @@ public class JvmPauseAlarm implements Runnable, Closeable
 
     private volatile boolean running = true;
 
+    /**
+     * Create a JVM Pause Alarm
+     * @param sleepTimeMs how often we should check to see if the JVM has paused too long (in milliseconds)
+     * @param alarmTimeMs trigger alarm if pause exceeds this number of milliseconds
+     */
     public JvmPauseAlarm(long sleepTimeMs, long alarmTimeMs) {
         this(sleepTimeMs, alarmTimeMs, l -> {});
     }
 
+    /**
+     * Create a JVM Pause Alarm
+     * @param sleepTimeMs how often we should check to see if the JVM has paused too long (in milliseconds)
+     * @param alarmTimeMs trigger alarm if pause exceeds this number of milliseconds
+     * @param onPause when there is a pause exceeding {@link alarmTimeMs} call this consumer with the length of the pause in milliseconds
+     */
     public JvmPauseAlarm(long sleepTimeMs, long alarmTimeMs, Consumer<Long> onPause) {
         this(Clock.systemUTC()::instant, sleepTimeMs, alarmTimeMs, onPause);
     }
 
+    /**
+     * Create a JVM Pause Alarm
+     * @param clock the clock to use for measuring time
+     * @param sleepTimeMs how often we should check to see if the JVM has paused too long (in milliseconds)
+     * @param alarmTimeMs trigger alarm if pause exceeds this number of milliseconds
+     * @param onPause when there is a pause exceeding {@link alarmTimeMs} call this consumer with the length of the pause in milliseconds
+     */
     public JvmPauseAlarm(Supplier<Instant> clock, long sleepTimeMs, long alarmTimeMs, Consumer<Long> onPause) {
         this.clock = clock;
         this.sleepTimeMs = sleepTimeMs;
@@ -77,6 +95,12 @@ public class JvmPauseAlarm implements Runnable, Closeable
         }
     }
 
+    /**
+     * Start a daemon thread to check for JVM pauses.
+     * Will be executed automatically by the container after this bean is created.
+     *
+     * @return this pause alarm in a started state
+     */
     @PostConstruct
     public JvmPauseAlarm start()
     {
