@@ -20,9 +20,6 @@ import java.lang.annotation.Target;
 
 import org.springframework.context.annotation.Import;
 
-/**
- * Configures, creates, and starts a JVM Pause Alarm to monitor for long JVM pauses and log them
- */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Import(JvmPauseAlarmConfiguration.class)
