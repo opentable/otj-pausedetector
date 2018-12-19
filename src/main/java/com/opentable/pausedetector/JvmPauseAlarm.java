@@ -48,7 +48,8 @@ public class JvmPauseAlarm implements Runnable, Closeable
     private static final Logger LOG = LoggerFactory.getLogger(JvmPauseAlarm.class);
     private static final long S_THRESHOLD = 1000;
 
-    private final long sleepTimeMs, alarmTimeMs;
+    private final long sleepTimeMs;
+    private final long alarmTimeMs;
     private final Consumer<Long> onPause;
     private final Supplier<Instant> clock;
 
