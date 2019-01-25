@@ -19,7 +19,7 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-spring</artifactId>
-    <version>183-SNAPSHOT</version>
+    <version>184</version>
   </parent>
 
   <scm>
@@ -35,10 +35,6 @@
   <version>2.0.3-SNAPSHOT</version>
   <description>OpenTable JVM pause detector component</description>
 
-  <properties>
-    <dep.otj-core.version>1.6.1-SNAPSHOT</dep.otj-core.version>
-    <dep.otj-logging.version>3.0.1-SNAPSHOT</dep.otj-logging.version>
-  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
