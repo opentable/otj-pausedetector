@@ -35,26 +35,6 @@
   <version>2.0.4-SNAPSHOT</version>
   <description>OpenTable JVM pause detector component</description>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.opentable.components</groupId>
-        <artifactId>otj-logging</artifactId>
-         <version>${dep.otj-logging.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -70,12 +50,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.opentable.components</groupId>
-      <artifactId>otj-logging</artifactId>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
