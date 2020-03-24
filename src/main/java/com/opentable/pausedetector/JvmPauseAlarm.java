@@ -21,7 +21,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
@@ -29,7 +28,6 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
 
 /**
  * This class performs a simple task, to try to detect a pause in a process (usually a JVM GC process).
@@ -52,9 +50,6 @@ public class JvmPauseAlarm implements Runnable, Closeable
     private final long alarmTimeMs;
     private final Consumer<Long> onPause;
     private final Supplier<Instant> clock;
-
-    private Function<Long, Marker> markerCreator = l -> null; //NOPMD - I'm lazy and setting this final with a catch is PITA
-
     private volatile boolean running = true;
 
     /**
@@ -88,12 +83,6 @@ public class JvmPauseAlarm implements Runnable, Closeable
         this.sleepTimeMs = sleepTimeMs;
         this.alarmTimeMs = alarmTimeMs;
         this.onPause = onPause;
-
-        try {
-            markerCreator = new PauseMetadataFactory();
-        } catch (Throwable t) { //NOPMD - NoClassDefFound Possible
-            LOG.trace("Failed to initialize metadata", t);
-        }
     }
 
     /**
@@ -155,7 +144,7 @@ public class JvmPauseAlarm implements Runnable, Closeable
             final long pauseMs = now - lastUpdate;
 
             if (pauseMs > alarmTimeMs) {
-                LOG.warn(markerCreator.apply(pauseMs), "Detected pause of {}!", formatTime(pauseMs));
+                LOG.warn("Detected pause of {}!", formatTime(pauseMs));
                 try {
                     onPause.accept(pauseMs);
                 } catch (Exception e) {
