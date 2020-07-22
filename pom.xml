@@ -26,7 +26,7 @@
     <connection>scm:git:git://github.com/opentable/otj-pausedetector.git</connection>
     <developerConnection>scm:git:git@github.com:opentable/otj-pausedetector.git</developerConnection>
     <url>http://github.com/opentable/otj-pausedetector</url>
-    <tag>HEAD</tag>
+    <tag>otj-pausedetector-5.2.0</tag>
   </scm>
 
 
@@ -44,7 +44,7 @@
   <groupId>com.opentable.components</groupId>
   <artifactId>otj-pausedetector</artifactId>
   <name>otj-pausedetector</name>
-  <version>5.2.0-SNAPSHOT</version>
+  <version>5.2.0</version>
   <description>OpenTable JVM pause detector component</description>
 
   <dependencies>
