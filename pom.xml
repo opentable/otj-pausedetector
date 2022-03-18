@@ -19,7 +19,7 @@
   <parent>
     <groupId>com.opentable</groupId>
     <artifactId>otj-parent-spring</artifactId>
-    <version>253</version>
+    <version>9999-SNAPSHOT</version>
   </parent>
 
   <scm>
@@ -31,11 +31,6 @@
 
 
   <properties>
-    <!-- Remove once parent updated -->
-    <dep.spring-boot.version>2.2.7.RELEASE</dep.spring-boot.version>
-    <dep.spring.version>5.2.6.RELEASE</dep.spring.version>
-    <dep.otj-core.version>5.2.0</dep.otj-core.version>
-    <dep.otj-spring.version>5.2.0</dep.otj-spring.version>
     <basepom.oss.skip-scala-doc>true</basepom.oss.skip-scala-doc>
     <basepom.check.skip-javadoc>false</basepom.check.skip-javadoc>
     <basepom.check.fail-javadoc>false</basepom.check.fail-javadoc>
